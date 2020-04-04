@@ -20,6 +20,7 @@ public class QuizActivity extends AppCompatActivity {
 
     private static final String TAG = "QuizActivity";
     private static final String KEY_INDEX = "index";
+    private static final String KEY_ANSWERED_ARRAY = "answered_array";
 
     private Question[] mQuestionBank = new Question[] {
             new Question(R.string.question_australia, true),
@@ -49,6 +50,7 @@ public class QuizActivity extends AppCompatActivity {
 
         if (savedInstanceState != null) {
             mCurrentIndex = savedInstanceState.getInt(KEY_INDEX, 0);
+            mQuestionAnswered = savedInstanceState.getBooleanArray(KEY_ANSWERED_ARRAY);
         }
 
         mQuestionTextView = findViewById(R.id.question_text_view);
@@ -156,6 +158,7 @@ public class QuizActivity extends AppCompatActivity {
         super.onSaveInstanceState(savedInstanceState);
         Log.i(TAG, "onSaveInstanceState");
         savedInstanceState.putInt(KEY_INDEX, mCurrentIndex);
+        savedInstanceState.putBooleanArray(KEY_ANSWERED_ARRAY, mQuestionAnswered);
     }
 
     @Override
