@@ -14,4 +14,5 @@
     <string name="prev_button">PREV</string>
     <string name="prev_button_description">Previous Question</string>
     <string name="next_button_description">Next Question</string>
+    <string name="quiz_complete_message">Congratulations! You completed the quiz. Your score is </string>
 </resources>

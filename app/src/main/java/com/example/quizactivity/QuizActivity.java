@@ -10,6 +10,8 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.Locale;
+
 public class QuizActivity extends AppCompatActivity {
 
     private Button mTrueButton;
@@ -17,10 +19,12 @@ public class QuizActivity extends AppCompatActivity {
     private ImageButton mNextButton;
     private ImageButton mPrevButton;
     private TextView mQuestionTextView;
+    private int mCurrentScore;
 
     private static final String TAG = "QuizActivity";
     private static final String KEY_INDEX = "index";
     private static final String KEY_ANSWERED_ARRAY = "answered_array";
+    private static final String KEY_SCORE = "score";
 
     private Question[] mQuestionBank = new Question[] {
             new Question(R.string.question_australia, true),
@@ -51,6 +55,7 @@ public class QuizActivity extends AppCompatActivity {
         if (savedInstanceState != null) {
             mCurrentIndex = savedInstanceState.getInt(KEY_INDEX, 0);
             mQuestionAnswered = savedInstanceState.getBooleanArray(KEY_ANSWERED_ARRAY);
+            mCurrentScore = savedInstanceState.getInt(KEY_SCORE, 0);
         }
 
         mQuestionTextView = findViewById(R.id.question_text_view);
@@ -75,7 +80,6 @@ public class QuizActivity extends AppCompatActivity {
 
         updateQuestion();  // update question after setting up answer buttons as update questions
                             // calls updateAnswerButtons()
-
         mNextButton = findViewById(R.id.next_button);
         mNextButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -118,11 +122,27 @@ public class QuizActivity extends AppCompatActivity {
 
         if (userPressedTrue == answerIsTrue) {
             messageResId = R.string.correct_toast;
+            mCurrentScore++;
         } else {
             messageResId = R.string.incorrect_toast;
         }
 
         Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show();
+
+        boolean allAnswered = true;
+        int messageCompleteId;
+        for (boolean answered : mQuestionAnswered) {
+            if (!answered) {
+                allAnswered = false;
+                break;
+            }
+        }
+        if (allAnswered) {
+            messageCompleteId = R.string.quiz_complete_message;
+            double scoreInPercent = ((double) mCurrentScore / mQuestionBank.length) * 100;
+            String message = String.format(Locale.ENGLISH, "%s %.2f", getString(messageCompleteId), scoreInPercent);
+            Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void updateAnswerButtons() {
@@ -159,6 +179,7 @@ public class QuizActivity extends AppCompatActivity {
         Log.i(TAG, "onSaveInstanceState");
         savedInstanceState.putInt(KEY_INDEX, mCurrentIndex);
         savedInstanceState.putBooleanArray(KEY_ANSWERED_ARRAY, mQuestionAnswered);
+        savedInstanceState.putInt(KEY_SCORE, mCurrentScore);
     }
 
     @Override
