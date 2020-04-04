@@ -30,6 +30,15 @@ public class QuizActivity extends AppCompatActivity {
             new Question(R.string.question_asia, true),
     };
 
+    private boolean[] mQuestionAnswered = new boolean[] {
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+    };
+
     private int mCurrentIndex = 0;
 
     @Override
@@ -50,7 +59,6 @@ public class QuizActivity extends AppCompatActivity {
                 updateQuestion();
             }
         });
-        updateQuestion();
 
         mTrueButton = findViewById(R.id.true_button);
         mTrueButton.setOnClickListener(new View.OnClickListener() {
@@ -62,6 +70,9 @@ public class QuizActivity extends AppCompatActivity {
 
         mFalseButton = findViewById(R.id.false_button);
         mFalseButton.setOnClickListener(new FalseButtonListener());
+
+        updateQuestion();  // update question after setting up answer buttons as update questions
+                            // calls updateAnswerButtons()
 
         mNextButton = findViewById(R.id.next_button);
         mNextButton.setOnClickListener(new View.OnClickListener() {
@@ -92,11 +103,15 @@ public class QuizActivity extends AppCompatActivity {
     private void updateQuestion() {
         int question = mQuestionBank[mCurrentIndex].getTextResId();
         mQuestionTextView.setText(question);
+
+        updateAnswerButtons();
     }
 
     private void checkAnswer(boolean userPressedTrue) {
         boolean answerIsTrue = mQuestionBank[mCurrentIndex].isAnswerTrue();
 
+        mQuestionAnswered[mCurrentIndex] = true;
+        updateAnswerButtons();
         int messageResId;
 
         if (userPressedTrue == answerIsTrue) {
@@ -106,6 +121,16 @@ public class QuizActivity extends AppCompatActivity {
         }
 
         Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show();
+    }
+
+    public void updateAnswerButtons() {
+        if (mQuestionAnswered[mCurrentIndex]) {
+            mTrueButton.setEnabled(false);
+            mFalseButton.setEnabled(false);
+        } else {
+            mTrueButton.setEnabled(true);
+            mFalseButton.setEnabled(true);
+        }
     }
 
     @Override
