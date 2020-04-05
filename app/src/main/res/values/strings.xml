@@ -20,4 +20,5 @@
     <string name="cheat_button">Cheat!</string>
     <string name="judgement_toast">Cheating is wrong.</string>
     <string name="api_level_report_text">API Level </string>
+    <string name="remaining_cheats_information">Remaining cheats: </string>
 </resources>

@@ -24,10 +24,12 @@ public class CheatActivity extends AppCompatActivity {
 
     private boolean mAnswerIsTrue;
     private boolean mIsAnswerShown;
+    private int mCheatsRemaining;
 
     private TextView mAnswerTextView;
     private Button mShowAnswerButton;
     private TextView mApiLevelTextView;
+    private TextView mRemainingCheatsTextView;
 
     public static Intent newIntent(Context packageContext, boolean answerIsTrue) {
         Intent intent = new Intent(packageContext, CheatActivity.class);
@@ -44,7 +46,7 @@ public class CheatActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cheat);
 
-        // get the answer from quiz activity
+        // get the data from quiz activity
         mAnswerIsTrue = getIntent().getBooleanExtra(EXTRA_ANSWER_IS_TRUE, false);
 
         // set up answer text view
@@ -81,7 +83,6 @@ public class CheatActivity extends AppCompatActivity {
         setResult(RESULT_OK, data);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void showAnswer(boolean isAnswerShown) {
         if (isAnswerShown) {
             if (mAnswerIsTrue) {
@@ -92,7 +93,7 @@ public class CheatActivity extends AppCompatActivity {
             int cx = mShowAnswerButton.getWidth() / 2;
             int cy = mShowAnswerButton.getHeight() / 2;
             float radius = mShowAnswerButton.getWidth();
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP && (radius != 0)) {
                 Animator anim = ViewAnimationUtils.createCircularReveal(mShowAnswerButton, cx, cy, radius, 0);
                 anim.addListener(new AnimatorListenerAdapter() {
                     @Override

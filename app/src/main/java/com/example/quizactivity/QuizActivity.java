@@ -22,14 +22,17 @@ public class QuizActivity extends AppCompatActivity {
     private ImageButton mNextButton;
     private ImageButton mPrevButton;
     private TextView mQuestionTextView;
+    private TextView mRemainingCheatsTextView;
 
     private int mCurrentScore;
+    private int mCheatsRemaining;
 
     private static final String TAG = "QuizActivity";
     private static final String KEY_INDEX = "index";
     private static final String KEY_ANSWERED_ARRAY = "answered_array";
     private static final String KEY_SCORE = "score";
     private static final String KEY_CHEATED_ARRAY = "cheated_array";
+    private static final String KEY_CHEATS_REMAINING = "cheats_remaining";
 
     private static final int REQUEST_CODE_CHEAT = 0;
 
@@ -74,9 +77,14 @@ public class QuizActivity extends AppCompatActivity {
             mQuestionAnswered = savedInstanceState.getBooleanArray(KEY_ANSWERED_ARRAY);
             mCurrentScore = savedInstanceState.getInt(KEY_SCORE, 0);
             mCheated = savedInstanceState.getBooleanArray(KEY_CHEATED_ARRAY);
+            mCheatsRemaining = savedInstanceState.getInt(KEY_CHEATS_REMAINING, 3);
+        } else {
+            mCurrentIndex = 0;
+            mCurrentScore = 0;
+            mCheatsRemaining = 3;
         }
 
-        // set up text view
+        // set up question text view
         mQuestionTextView = findViewById(R.id.question_text_view);
         mQuestionTextView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -125,6 +133,9 @@ public class QuizActivity extends AppCompatActivity {
 
         // set up cheat button
         mCheatButton = findViewById(R.id.cheat_button);
+        if (mCheatsRemaining == 0) {
+            mCheatButton.setEnabled(false);
+        }
         mCheatButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -133,6 +144,9 @@ public class QuizActivity extends AppCompatActivity {
                 startActivityForResult(intent, REQUEST_CODE_CHEAT);
             }
         });
+
+        // set up remaining cheats text view
+        setRemainingCheatsTextView();
 
         // update the question
         updateQuestion();  // update question after setting up answer buttons as update questions
@@ -152,7 +166,13 @@ public class QuizActivity extends AppCompatActivity {
             if (data == null) {
                 return;
             }
-            mCheated[mCurrentIndex] = CheatActivity.wasAnswerShown(data);
+            boolean wasAnswerShown = CheatActivity.wasAnswerShown(data);
+            if (!mCheated[mCurrentIndex] && wasAnswerShown && !mQuestionAnswered[mCurrentIndex]) {
+                mCheatsRemaining--;
+            }
+            mCheated[mCurrentIndex] = wasAnswerShown;
+            setRemainingCheatsTextView();
+            if (mCheatsRemaining == 0) mCheatButton.setEnabled(false);
         }
     }
 
@@ -162,6 +182,12 @@ public class QuizActivity extends AppCompatActivity {
             checkAnswer(false);
             updateAnswerButtons();
         }
+    }
+
+    private void setRemainingCheatsTextView() {
+        mRemainingCheatsTextView = findViewById(R.id.remaining_cheats_text_view);
+        String remainingCheatsText = getString(R.string.remaining_cheats_information) + mCheatsRemaining;
+        mRemainingCheatsTextView.setText(remainingCheatsText);
     }
 
     private void updateQuestion() {
@@ -244,6 +270,7 @@ public class QuizActivity extends AppCompatActivity {
         savedInstanceState.putBooleanArray(KEY_ANSWERED_ARRAY, mQuestionAnswered);
         savedInstanceState.putInt(KEY_SCORE, mCurrentScore);
         savedInstanceState.putBooleanArray(KEY_CHEATED_ARRAY, mCheated);
+        savedInstanceState.putInt(KEY_CHEATS_REMAINING, mCheatsRemaining);
     }
 
     @Override
